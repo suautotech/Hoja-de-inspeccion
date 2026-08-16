@@ -5,45 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hoja de Inspección Técnica - Taller Móvil</title>
     <style>
-        :root { --primary: #d97706; --primary-dark: #b45309; --bg: #f3f4f6; --card: #ffffff; --text: #1f2937; --border: #e5e7eb; }
+        :root {
+            --primary: #d97706;
+            --primary-dark: #b45309;
+            --bg: #f3f4f6;
+            --card: #ffffff;
+            --text: #1f2937;
+            --border: #e5e7eb;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding: 15px; }
         .container { max-width: 900px; margin: 0 auto; background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        
         .header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 15px; margin-bottom: 20px; gap: 15px; }
+        .brand { display: flex; align-items: center; gap: 15px; }
+        .title h1 { font-size: 22px; color: var(--primary-dark); }
+        .title p { font-size: 13px; color: #666; }
+
         .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .card-section { background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px; }
+        .card-section { background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
         .card-section h3 { font-size: 15px; margin-bottom: 10px; color: var(--primary-dark); border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; }
         .field { margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
         .field label { font-weight: 600; width: 35%; }
         .field input { width: 63%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
+
         .table-responsive { overflow-x: auto; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th, td { border: 1px solid var(--border); padding: 8px; text-align: left; }
         th { background: #f3f4f6; font-weight: 600; }
         .category-header { background: #fef3c7; font-weight: bold; color: #92400e; }
         .radio-cell { text-align: center; width: 50px; }
-        textarea { width: 100%; height: 70px; padding: 8px; border: 1px solid #ccc; border-radius: 6px; resize: vertical; }
+
+        textarea { width: 100%; height: 70px; padding: 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; resize: vertical; margin-bottom: 15px; }
         
-        /* Contenedores para impresión */
         .print-only { display: none; }
-        
+
         .photos-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
         .photo-item { width: 90px; height: 90px; border-radius: 6px; overflow: hidden; border: 1px solid #ccc; position: relative; }
         .photo-item img { width: 100%; height: 100%; object-fit: cover; }
         .btn-delete-photo { position: absolute; top: 0; right: 0; background: red; color: white; border: none; font-size: 10px; cursor: pointer; padding: 2px 5px; border-radius: 0 0 0 5px; }
 
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 25px; }
-        button { padding: 10px 18px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        button { padding: 10px 18px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s; font-size: 14px; }
         .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
         .btn-secondary { background: #4b5563; color: white; }
+        .btn-secondary:hover { background: #374151; }
 
+        .history { margin-top: 30px; border-top: 2px solid var(--border); padding-top: 20px; }
+        .action-btn { padding: 4px 8px; font-size: 14px; margin-right: 4px; cursor: pointer;}
+        
         @media print {
             body { background: white; padding: 0; }
             .container { box-shadow: none; max-width: 100%; }
             .btn-group, .history, input[type="file"], .btn-delete-photo { display: none !important; }
+            input { border: none !important; background: transparent !important; }
             textarea { display: none !important; }
-            .print-only { display: block !important; white-space: pre-wrap; font-size: 14px; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
-            input { border: none !important; }
+            .print-only { display: block !important; white-space: pre-wrap; font-size: 13px; line-height: 1.4; padding: 4px 0; }
         }
     </style>
 </head>
@@ -51,7 +70,15 @@
 
 <div class="container">
     <div class="header">
-        <h1>Hoja de Inspección SU AutoTech</h1>
+        <div class="brand">
+            <div class="logo-container">
+                <img src="Logo.png" style="width: 80px; height: 80px; object-fit: contain;">
+            </div>
+            <div class="title">
+                <h1>Hoja de Inspección SU AutoTech</h1>
+                <p>Servicio Técnico Diagnóstico Multimarca</p>
+            </div>
+        </div>
     </div>
 
     <div class="grid-2">
@@ -60,49 +87,69 @@
             <div class="field"><label>Cliente:</label><input type="text" id="cliente"></div>
             <div class="field"><label>Fecha:</label><input type="date" id="fecha"></div>
             <div class="field"><label>Orden N°:</label><input type="text" id="orden"></div>
+            <div class="field"><label>Técnico:</label><input type="text" id="tecnico"></div>
         </div>
         <div class="card-section">
             <h3>🚗 Datos del Vehículo</h3>
-            <div class="field"><label>Vehículo:</label><input type="text" id="vehiculo"></div>
-            <div class="field"><label>Placa/KM:</label><input type="text" id="km"></div>
+            <div class="field"><label>Vehículo:</label><input type="text" id="vehiculo" placeholder="Marca / Modelo"></div>
+            <div class="field"><label>Año / Placa:</label><input type="text" id="placa"></div>
+            <div class="field"><label>Kilometraje:</label><input type="text" id="km"></div>
+            <div class="field"><label>Motor / VIN:</label><input type="text" id="vin"></div>
         </div>
     </div>
 
     <div class="table-responsive">
         <table>
+            <thead>
+                <tr>
+                    <th>Elemento de Inspección</th>
+                    <th class="radio-cell">Bueno</th>
+                    <th class="radio-cell">Reg.</th>
+                    <th class="radio-cell">Malo</th>
+                    <th class="radio-cell">N/A</th>
+                </tr>
+            </thead>
             <tbody id="inspectionBody"></tbody>
         </table>
     </div>
 
-    <div class="card-section">
-        <h3>📋 Recomendaciones</h3>
+    <div class="card-section" style="margin-bottom: 15px;">
+        <h3>📋 Recomendaciones y Observaciones</h3>
         <textarea id="observaciones" oninput="syncText('observaciones')"></textarea>
         <div class="print-only" id="print-observaciones"></div>
     </div>
 
-    <div class="card-section">
+    <div class="card-section" style="margin-bottom: 15px;">
         <h3>🛠️ Materiales y Repuestos</h3>
         <textarea id="repuestos" oninput="syncText('repuestos')"></textarea>
         <div class="print-only" id="print-repuestos"></div>
     </div>
 
-    <div class="card-section">
-        <h3>📸 Evidencia</h3>
+    <div class="card-section" style="margin-bottom: 20px;">
+        <h3>📸 Evidencia Fotográfica</h3>
         <input type="file" id="photoInput" accept="image/*" multiple onchange="loadPhotos(event)">
         <div class="photos-grid" id="photosGrid"></div>
     </div>
 
     <div class="btn-group">
-        <button class="btn-primary" onclick="guardarReporte()">💾 Guardar</button>
-        <button class="btn-secondary" onclick="window.print()">🖨️ Imprimir PDF</button>
-        <button class="btn-secondary" onclick="limpiarFormulario()">➕ Nuevo</button>
+        <button class="btn-primary" onclick="guardarReporte()">💾 Guardar Reporte</button>
+        <button class="btn-secondary" onclick="window.print()">🖨️ Imprimir / PDF</button>
+        <button class="btn-secondary" style="background:#059669;" onclick="limpiarFormulario()">➕ Nuevo Reporte</button>
     </div>
 
     <div class="history">
-        <h3>📁 Historial</h3>
+        <h3>📁 Historial de Diagnósticos Guardados</h3>
         <div class="table-responsive">
             <table>
-                <thead><tr><th>Orden</th><th>Cliente</th><th>Acciones</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Orden</th>
+                        <th>Cliente</th>
+                        <th>Vehículo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
                 <tbody id="historyBody"></tbody>
             </table>
         </div>
@@ -110,28 +157,38 @@
 </div>
 
 <script>
-    // --- Lógica del Sistema ---
     const items = [
-        { cat: "1. Motor", list: ["Fugas de aceite", "Refrigerante", "Correas"] },
-        { cat: "2. Eléctrico", list: ["Batería", "Alternador"] },
-        { cat: "3. Frenos", list: ["Pastillas", "Discos", "Líquido"] }
+        { cat: "1. Sistema del Motor & Fluidos", list: ["Fugas de aceite de motor", "Fugas de refrigerante", "Nivel y estado de refrigerante", "Filtro de aire", "Correas de accesorios", "Luces de advertencia (Check Engine)"] },
+        { cat: "2. Sistema Eléctrico & Carga", list: ["Batería (Bornes, carga y sulfatación)", "Alternador (Voltaje de carga)", "Motor de arranque", "Cableado y conexiones a tierra"] },
+        { cat: "3. Sistema de Frenos", list: ["Pastillas / Tacos delanteros", "Discos de freno", "Líquido de frenos (Nivel / Humedad)", "Bandas / Tacos traseros", "Freno de mano"] },
+        { cat: "4. Suspensión & Dirección", list: ["Amortiguadores", "Terminales y rótulas de dirección", "Bujes y barra estabilizadora", "Líquido de Power Stering", "Estado y presión de llantas"] },
+        { cat: "5. Transmisión", list: ["Nivel / Estado de aceite de Transmisión", "Fugas en sellos / cárter", "Botas y flechas/ejes", "Soportes de motor / transmisión"] }
     ];
 
     let photos = [];
+    let currentEditIndex = -1; // -1 significa nuevo reporte
 
-    // Función para sincronizar texto para imprimir
     function syncText(id) {
         document.getElementById('print-' + id).innerText = document.getElementById(id).value;
     }
 
+    function syncAllTexts() {
+        syncText('observaciones');
+        syncText('repuestos');
+    }
+
     function initTable() {
         const tbody = document.getElementById('inspectionBody');
-        items.forEach((group, idx) => {
+        tbody.innerHTML = '';
+        let index = 0;
+        items.forEach(group => {
             tbody.innerHTML += `<tr><td colspan="5" class="category-header">${group.cat}</td></tr>`;
             group.list.forEach(item => {
-                tbody.innerHTML += `<tr><td>${item}</td><td><input type="radio" name="${item}"></td></tr>`;
+                tbody.innerHTML += `<tr><td>${item}</td><td class="radio-cell"><input type="radio" name="item_${index}" value="Bueno"></td><td class="radio-cell"><input type="radio" name="item_${index}" value="Regular"></td><td class="radio-cell"><input type="radio" name="item_${index}" value="Malo"></td><td class="radio-cell"><input type="radio" name="item_${index}" value="N/A" checked></td></tr>`;
+                index++;
             });
         });
+        if(!document.getElementById('fecha').value) document.getElementById('fecha').valueAsDate = new Date();
     }
 
     function loadPhotos(e) {
@@ -143,33 +200,117 @@
         });
     }
 
+    function eliminarFoto(idx) {
+        photos.splice(idx, 1);
+        renderPhotos();
+    }
+
     function renderPhotos() {
         const grid = document.getElementById('photosGrid');
         grid.innerHTML = '';
         photos.forEach((p, idx) => {
-            grid.innerHTML += `<div class="photo-item"><img src="${p}"><button class="btn-delete-photo" onclick="photos.splice(${idx},1); renderPhotos()">X</button></div>`;
+            grid.innerHTML += `<div class="photo-item"><img src="${p}"><button class="btn-delete-photo" onclick="eliminarFoto(${idx})">X</button></div>`;
         });
     }
 
     function guardarReporte() {
-        alert("Reporte guardado");
-        // Aquí iría tu lógica real de localStorage
+        const estadoRadios = [];
+        document.querySelectorAll('input[type="radio"]:checked').forEach(r => estadoRadios.push({ name: r.name, value: r.value }));
+        
+        const reporte = {
+            orden: document.getElementById('orden').value || Date.now(),
+            cliente: document.getElementById('cliente').value,
+            fecha: document.getElementById('fecha').value,
+            tecnico: document.getElementById('tecnico').value,
+            vehiculo: document.getElementById('vehiculo').value,
+            placa: document.getElementById('placa').value,
+            km: document.getElementById('km').value,
+            vin: document.getElementById('vin').value,
+            observaciones: document.getElementById('observaciones').value,
+            repuestos: document.getElementById('repuestos').value,
+            photos: photos,
+            estadoRadios: estadoRadios
+        };
+
+        let historial = JSON.parse(localStorage.getItem('taller_reportes') || '[]');
+
+        if (currentEditIndex > -1) {
+            historial[currentEditIndex] = reporte; // Actualiza el existente
+            alert('✅ Reporte actualizado');
+        } else {
+            historial.push(reporte); // Crea uno nuevo
+            alert('✅ Reporte guardado');
+        }
+        
+        localStorage.setItem('taller_reportes', JSON.stringify(historial));
+        actualizarHistorial();
+        limpiarFormulario(); // Reseteamos el formulario después de guardar
+    }
+
+    function cargarReporte(idx) {
+        currentEditIndex = idx; // Activamos modo edición
+        let historial = JSON.parse(localStorage.getItem('taller_reportes') || '[]');
+        let r = historial[idx];
+        
+        document.getElementById('orden').value = r.orden;
+        document.getElementById('cliente').value = r.cliente;
+        document.getElementById('fecha').value = r.fecha;
+        document.getElementById('tecnico').value = r.tecnico;
+        document.getElementById('vehiculo').value = r.vehiculo;
+        document.getElementById('placa').value = r.placa;
+        document.getElementById('km').value = r.km;
+        document.getElementById('vin').value = r.vin;
+        document.getElementById('observaciones').value = r.observaciones;
+        document.getElementById('repuestos').value = r.repuestos;
+        photos = r.photos || [];
+        renderPhotos();
+        
+        document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
+        if(r.estadoRadios) {
+            r.estadoRadios.forEach(item => {
+                const radio = document.querySelector(`input[name="${item.name}"][value="${item.value}"]`);
+                if(radio) radio.checked = true;
+            });
+        }
+        syncAllTexts();
+        window.scrollTo(0, 0);
+    }
+
+    function actualizarHistorial() {
+        const body = document.getElementById('historyBody');
+        const historial = JSON.parse(localStorage.getItem('taller_reportes') || '[]');
+        body.innerHTML = '';
+        historial.forEach((r, idx) => {
+            body.innerHTML += `<tr><td>${r.fecha}</td><td>${r.orden}</td><td>${r.cliente}</td><td>${r.vehiculo}</td><td>
+                <button class="action-btn btn-primary" onclick="cargarReporte(${idx})">👁️</button>
+                <button class="action-btn btn-secondary" onclick="eliminarReporte(${idx})">🗑️</button>
+            </td></tr>`;
+        });
+    }
+
+    function eliminarReporte(idx) {
+        if(confirm("¿Borrar reporte?")) {
+            let historial = JSON.parse(localStorage.getItem('taller_reportes') || '[]');
+            historial.splice(idx, 1);
+            localStorage.setItem('taller_reportes', JSON.stringify(historial));
+            actualizarHistorial();
+        }
     }
 
     function limpiarFormulario() {
-        document.querySelectorAll('input[type="text"], textarea').forEach(i => i.value = '');
+        currentEditIndex = -1; // Volvemos a modo "nuevo"
+        document.querySelectorAll('input[type="text"], input[type="date"], textarea').forEach(i => i.value = '');
         photos = [];
         renderPhotos();
-        syncText('observaciones');
-        syncText('repuestos');
+        initTable();
+        syncAllTexts();
     }
 
     window.onload = function() { 
         initTable(); 
-        syncText('observaciones'); 
-        syncText('repuestos'); 
+        actualizarHistorial(); 
+        syncAllTexts();
     };
 </script>
 </body>
-    </html>
-    
+</html>
