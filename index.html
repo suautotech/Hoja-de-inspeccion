@@ -58,8 +58,16 @@
             body { background: white; padding: 0; }
             .container { box-shadow: none; max-width: 100%; }
             .btn-group, .history, input[type="file"], .btn-delete-photo { display: none !important; }
+            
+            /* Corrección para imprimir textos largos */
+            textarea { 
+                border: none !important; 
+                height: auto !important; 
+                overflow: visible !important; 
+                display: block !important; 
+                padding: 0 !important;
+            }
             input { border: none !important; background: transparent !important; }
-            textarea { border: none !important; }
         }
     </style>
 </head>
@@ -161,7 +169,7 @@
     ];
 
     let photos = [];
-    let currentEditIndex = -1; // -1 significa nuevo reporte
+    let currentEditIndex = -1; 
 
     function initTable() {
         const tbody = document.getElementById('inspectionBody');
@@ -221,20 +229,20 @@
         let historial = JSON.parse(localStorage.getItem('taller_reportes') || '[]');
 
         if (currentEditIndex > -1) {
-            historial[currentEditIndex] = reporte; // Actualiza el existente
+            historial[currentEditIndex] = reporte; 
             alert('✅ Reporte actualizado');
         } else {
-            historial.push(reporte); // Crea uno nuevo
+            historial.push(reporte); 
             alert('✅ Reporte guardado');
         }
         
         localStorage.setItem('taller_reportes', JSON.stringify(historial));
         actualizarHistorial();
-        limpiarFormulario(); // Reseteamos el formulario después de guardar
+        limpiarFormulario();
     }
 
     function cargarReporte(idx) {
-        currentEditIndex = idx; // Activamos modo edición
+        currentEditIndex = idx;
         let historial = JSON.parse(localStorage.getItem('taller_reportes') || '[]');
         let r = historial[idx];
         
@@ -283,7 +291,7 @@
     }
 
     function limpiarFormulario() {
-        currentEditIndex = -1; // Volvemos a modo "nuevo"
+        currentEditIndex = -1;
         document.querySelectorAll('input[type="text"], input[type="date"], textarea').forEach(i => i.value = '');
         photos = [];
         renderPhotos();
