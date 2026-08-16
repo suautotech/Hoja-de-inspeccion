@@ -11,36 +11,39 @@
         .container { max-width: 900px; margin: 0 auto; background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 15px; margin-bottom: 20px; gap: 15px; }
         .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .card-section { background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
+        .card-section { background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px; }
         .card-section h3 { font-size: 15px; margin-bottom: 10px; color: var(--primary-dark); border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; }
         .field { margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
         .field label { font-weight: 600; width: 35%; }
         .field input { width: 63%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px; }
+        .table-responsive { overflow-x: auto; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th, td { border: 1px solid var(--border); padding: 8px; text-align: left; }
-        th { background: #f3f4f6; }
-        .radio-cell { text-align: center; width: 50px; }
+        th { background: #f3f4f6; font-weight: 600; }
         .category-header { background: #fef3c7; font-weight: bold; color: #92400e; }
-        
-        textarea { width: 100%; height: 70px; padding: 8px; border: 1px solid #ccc; border-radius: 6px; resize: vertical; margin-bottom: 15px; }
+        .radio-cell { text-align: center; width: 50px; }
+        textarea { width: 100%; height: 70px; padding: 8px; border: 1px solid #ccc; border-radius: 6px; resize: vertical; }
         
         /* Contenedores para impresión */
         .print-only { display: none; }
         
-        .btn-group { display: flex; gap: 10px; margin-bottom: 25px; }
+        .photos-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .photo-item { width: 90px; height: 90px; border-radius: 6px; overflow: hidden; border: 1px solid #ccc; position: relative; }
+        .photo-item img { width: 100%; height: 100%; object-fit: cover; }
+        .btn-delete-photo { position: absolute; top: 0; right: 0; background: red; color: white; border: none; font-size: 10px; cursor: pointer; padding: 2px 5px; border-radius: 0 0 0 5px; }
+
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 25px; }
         button { padding: 10px 18px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-secondary { background: #4b5563; color: white; }
 
         @media print {
             body { background: white; padding: 0; }
-            .container { box-shadow: none; max-width: 100%; padding: 0; }
+            .container { box-shadow: none; max-width: 100%; }
             .btn-group, .history, input[type="file"], .btn-delete-photo { display: none !important; }
-            /* Ocultamos el textarea y mostramos el div de impresión */
             textarea { display: none !important; }
-            .print-only { display: block !important; white-space: pre-wrap; margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+            .print-only { display: block !important; white-space: pre-wrap; font-size: 14px; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
             input { border: none !important; }
-            h3 { break-after: avoid; }
         }
     </style>
 </head>
@@ -61,13 +64,15 @@
         <div class="card-section">
             <h3>🚗 Datos del Vehículo</h3>
             <div class="field"><label>Vehículo:</label><input type="text" id="vehiculo"></div>
-            <div class="field"><label>Kilometraje:</label><input type="text" id="km"></div>
+            <div class="field"><label>Placa/KM:</label><input type="text" id="km"></div>
         </div>
     </div>
 
-    <table>
-        <tbody id="inspectionBody"></tbody>
-    </table>
+    <div class="table-responsive">
+        <table>
+            <tbody id="inspectionBody"></tbody>
+        </table>
+    </div>
 
     <div class="card-section">
         <h3>📋 Recomendaciones</h3>
@@ -81,33 +86,47 @@
         <div class="print-only" id="print-repuestos"></div>
     </div>
 
+    <div class="card-section">
+        <h3>📸 Evidencia</h3>
+        <input type="file" id="photoInput" accept="image/*" multiple onchange="loadPhotos(event)">
+        <div class="photos-grid" id="photosGrid"></div>
+    </div>
+
     <div class="btn-group">
         <button class="btn-primary" onclick="guardarReporte()">💾 Guardar</button>
         <button class="btn-secondary" onclick="window.print()">🖨️ Imprimir PDF</button>
+        <button class="btn-secondary" onclick="limpiarFormulario()">➕ Nuevo</button>
+    </div>
+
+    <div class="history">
+        <h3>📁 Historial</h3>
+        <div class="table-responsive">
+            <table>
+                <thead><tr><th>Orden</th><th>Cliente</th><th>Acciones</th></tr></thead>
+                <tbody id="historyBody"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <script>
-    // Sincroniza el texto en tiempo real para que al imprimir esté listo
+    // --- Lógica del Sistema ---
+    const items = [
+        { cat: "1. Motor", list: ["Fugas de aceite", "Refrigerante", "Correas"] },
+        { cat: "2. Eléctrico", list: ["Batería", "Alternador"] },
+        { cat: "3. Frenos", list: ["Pastillas", "Discos", "Líquido"] }
+    ];
+
+    let photos = [];
+
+    // Función para sincronizar texto para imprimir
     function syncText(id) {
         document.getElementById('print-' + id).innerText = document.getElementById(id).value;
     }
 
-    // Al cargar la página, inicializar el sync por si hay datos guardados
-    function initSync() {
-        syncText('observaciones');
-        syncText('repuestos');
-    }
-
-    // Funciones básicas
-    const items = [
-        { cat: "Motor", list: ["Fugas", "Aceite"] },
-        { cat: "Frenos", list: ["Pastillas", "Discos"] }
-    ];
-
     function initTable() {
         const tbody = document.getElementById('inspectionBody');
-        items.forEach(group => {
+        items.forEach((group, idx) => {
             tbody.innerHTML += `<tr><td colspan="5" class="category-header">${group.cat}</td></tr>`;
             group.list.forEach(item => {
                 tbody.innerHTML += `<tr><td>${item}</td><td><input type="radio" name="${item}"></td></tr>`;
@@ -115,15 +134,42 @@
         });
     }
 
+    function loadPhotos(e) {
+        const files = Array.from(e.target.files);
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (evt) => { photos.push(evt.target.result); renderPhotos(); }
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function renderPhotos() {
+        const grid = document.getElementById('photosGrid');
+        grid.innerHTML = '';
+        photos.forEach((p, idx) => {
+            grid.innerHTML += `<div class="photo-item"><img src="${p}"><button class="btn-delete-photo" onclick="photos.splice(${idx},1); renderPhotos()">X</button></div>`;
+        });
+    }
+
     function guardarReporte() {
         alert("Reporte guardado");
-        // Tu lógica de guardado aquí
+        // Aquí iría tu lógica real de localStorage
+    }
+
+    function limpiarFormulario() {
+        document.querySelectorAll('input[type="text"], textarea').forEach(i => i.value = '');
+        photos = [];
+        renderPhotos();
+        syncText('observaciones');
+        syncText('repuestos');
     }
 
     window.onload = function() { 
         initTable(); 
-        initSync(); 
+        syncText('observaciones'); 
+        syncText('repuestos'); 
     };
 </script>
 </body>
-</html>
+    </html>
+    
